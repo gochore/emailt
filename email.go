@@ -8,7 +8,7 @@ type Email struct {
 	elements []Element
 }
 
-func (e *Email) Add(element ...Element) {
+func (e *Email) AddElements(element ...Element) {
 	e.elements = append(e.elements, element...)
 }
 

@@ -40,7 +40,20 @@ func TestEmail_Render(t *testing.T) {
 								B: 3,
 							},
 						},
-						Columns:    nil,
+						Columns: []Column{
+							{
+								Name:     "列1",
+								Template: "{{.A}}",
+							},
+							{
+								Name:     "列2",
+								Template: "{{.B}}",
+							},
+							{
+								Name:     "列3",
+								Template: "{{.A}}({{.B}})",
+							},
+						},
 						Attr:       DefaultTableAttr,
 						HeaderAttr: DefaultTableHeaderAttr,
 						DataAttr:   DefaultTableDataAttr,

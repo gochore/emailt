@@ -42,11 +42,44 @@ func TestTable_Render(t1 *testing.T) {
 			},
 			wantErr: false,
 		},
+		{
+			name: "with_columns",
+			fields: fields{
+				Data: []interface{}{
+					TestStruct1{
+						A: "a1",
+						B: 1,
+					},
+					TestStruct1{
+						A: "a2",
+						B: 2,
+					},
+					TestStruct1{
+						A: "a3",
+						B: 3,
+					},
+				},
+				Columns: []Column{
+					{
+						Name:     "列1",
+						Template: "{{.A}}",
+					},
+					{
+						Name:     "列2",
+						Template: "{{.B}}",
+					},
+					{
+						Name:     "列3",
+						Template: "{{.A}}({{.B}})",
+					},
+				},
+			},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t1.Run(tt.name, func(t1 *testing.T) {
-			t := NewTable()
-			t.Data = tt.fields.Data
+			t := NewTable().WithColumns(tt.fields.Columns).WithData(tt.fields.Data)
 			got := bytes.NewBuffer(nil)
 			err := t.Render(got)
 			if (err != nil) != tt.wantErr {

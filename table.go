@@ -24,6 +24,16 @@ func NewTable() Table {
 	}
 }
 
+func (t Table) WithData(data []interface{}) Table {
+	t.Data = data
+	return t
+}
+
+func (t Table) WithColumns(columns []Column) Table {
+	t.Columns = columns
+	return t
+}
+
 func (t Table) Render(writer io.Writer) error {
 	if len(t.Data) == 0 {
 		return fmt.Errorf("empty data")
@@ -41,54 +51,51 @@ func (t Table) Render(writer io.Writer) error {
 		}
 	}
 
-	columns := make([]Column, len(t.Columns))
-	copy(columns, t.Columns)
+	columns := t.Columns
 	if len(columns) == 0 {
 		numField := typ.NumField()
 		for i := 0; i < numField; i++ {
 			field := typ.Field(i)
 			columns = append(columns, Column{
-				Name: field.Name,
+				Name:     field.Name,
+				Template: fmt.Sprintf("{{.%s}}", field.Name),
 			})
 		}
 	}
-
-	render := newFmtWriter(writer)
-
-	render.Printlnf(`<table %s>`, t.Attr.String())
-
-	render.Println(`<tr>`)
-
-	var rowTplt *template.Template
+	var rowTemplate *template.Template
 	{
 		rowBuilder := strings.Builder{}
-		rowBuilder.WriteString(`<tr>`)
+		rowBuilder.WriteString("<tr>\n")
 		for _, column := range columns {
-			temp := column.Template
-			if temp == "" {
-				temp = fmt.Sprintf("{{.%s}}", column.Name)
-			}
-			rowBuilder.WriteString(fmt.Sprintf(`<td %s>%s</td>`, t.DataAttr, temp))
-			render.Printlnf(`<th %s>%s</th>`, t.HeaderAttr, column.Name)
+			rowBuilder.WriteString(fmt.Sprintf("<td %s>%s</td>\n", t.DataAttr, column.Template))
 		}
-		rowBuilder.WriteString(`</tr>`)
+		rowBuilder.WriteString("</tr>")
 		var err error
-		rowTplt, err = template.New("").Parse(rowBuilder.String())
+		rowTemplate, err = template.New("").Parse(rowBuilder.String())
 		if err != nil {
 			return fmt.Errorf("Parse: %w", err)
 		}
 	}
 
-	render.Println(`</tr>`)
+	render := newFmtWriter(writer)
+
+	render.Printlnf("<table %s>", t.Attr.String())
+
+	render.Println("<tr>")
+
+	for _, column := range columns {
+		render.Printlnf("<th %s>%s</th>", t.HeaderAttr, column.Name)
+	}
+	render.Println("</tr>")
 
 	for _, row := range t.Data {
-		if err := rowTplt.Execute(render, row); err != nil {
+		if err := rowTemplate.Execute(render, row); err != nil {
 			return fmt.Errorf("Execute: %w", err)
 		}
 		render.Println()
 	}
 
-	render.Println(`</table>`)
+	render.Println("</table>")
 
 	return render.Err()
 }
