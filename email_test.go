@@ -40,7 +40,10 @@ func TestEmail_Render(t *testing.T) {
 								B: 3,
 							},
 						},
-						Columns: nil,
+						Columns:    nil,
+						Attr:       DefaultTableAttr,
+						HeaderAttr: DefaultTableHeaderAttr,
+						DataAttr:   DefaultTableDataAttr,
 					},
 				},
 			},
@@ -65,7 +68,7 @@ func TestEmail_Render(t *testing.T) {
 
 			dir := "output"
 			_ = os.Mkdir(dir, 0755)
-			_ = ioutil.WriteFile(filepath.Join(dir, fmt.Sprintf("%s.html", tt.name)), got.Bytes(), 0644)
+			_ = ioutil.WriteFile(filepath.Join(dir, fmt.Sprintf("TestEmail_Render.%s.html", tt.name)), got.Bytes(), 0644)
 		})
 	}
 }

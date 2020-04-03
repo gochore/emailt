@@ -10,23 +10,31 @@ type Attribute struct {
 	Value string
 }
 
-func (a Attribute) Render() (string, error) {
-	if a.Name == "" {
-		return "", fmt.Errorf("empty name")
-	}
-	return fmt.Sprintf(`%s="%s"`, a.Name, a.Value), nil
-}
-
 type Attributes []Attribute
 
-func (as Attributes) Render() (string, error) {
+func (as Attributes) String() string {
 	var strs []string
 	for _, a := range as {
-		t, err := a.Render()
-		if err != nil {
-			return "", err
-		}
-		strs = append(strs, t)
+		strs = append(strs, fmt.Sprintf(`%s="%s"`, a.Name, a.Value))
 	}
-	return strings.Join(strs, " "), nil
+	return strings.Join(strs, " ")
+}
+
+func (as Attributes) Merge(newAs Attributes) Attributes {
+	ret := make(Attributes, len(as))
+	copy(ret, as)
+	for _, v := range newAs {
+		found := false
+		for i, v2 := range ret {
+			if v2.Name == v.Name {
+				ret[i].Value = v.Value
+				found = true
+				break
+			}
+		}
+		if !found {
+			ret = append(ret, v)
+		}
+	}
+	return ret
 }

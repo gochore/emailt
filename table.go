@@ -9,8 +9,19 @@ import (
 )
 
 type Table struct {
-	Data    []interface{}
-	Columns []Column
+	Data       []interface{}
+	Columns    []Column
+	Attr       Attributes
+	HeaderAttr Attributes
+	DataAttr   Attributes
+}
+
+func NewTable() Table {
+	return Table{
+		Attr:       DefaultTableAttr,
+		HeaderAttr: DefaultTableHeaderAttr,
+		DataAttr:   DefaultTableDataAttr,
+	}
 }
 
 func (t Table) Render(writer io.Writer) error {
@@ -44,7 +55,7 @@ func (t Table) Render(writer io.Writer) error {
 
 	render := newFmtWriter(writer)
 
-	render.Println(`<table>`)
+	render.Printlnf(`<table %s>`, t.Attr.String())
 
 	render.Println(`<tr>`)
 
@@ -53,12 +64,12 @@ func (t Table) Render(writer io.Writer) error {
 		rowBuilder := strings.Builder{}
 		rowBuilder.WriteString(`<tr>`)
 		for _, column := range columns {
-			t := column.Template
-			if t == "" {
-				t = fmt.Sprintf("{{.%s}}", column.Name)
+			temp := column.Template
+			if temp == "" {
+				temp = fmt.Sprintf("{{.%s}}", column.Name)
 			}
-			rowBuilder.WriteString(fmt.Sprintf(`<td>%s</td>`, t))
-			render.Printlnf(`<th>%s</th>`, column.Name)
+			rowBuilder.WriteString(fmt.Sprintf(`<td %s>%s</td>`, t.DataAttr, temp))
+			render.Printlnf(`<th %s>%s</th>`, t.HeaderAttr, column.Name)
 		}
 		rowBuilder.WriteString(`</tr>`)
 		var err error
@@ -83,8 +94,18 @@ func (t Table) Render(writer io.Writer) error {
 }
 
 type Column struct {
-	Name             string
-	Template         string
-	HeaderAttributes Attributes
-	DataAttributes   Attributes
+	Name     string
+	Template string
 }
+
+var (
+	DefaultTableAttr = Attributes{
+		{Name: "style", Value: "font-family: verdana,arial,sans-serif;font-size:14px;color:#333333;border-width: 1px;border-color: #666666;border-collapse: collapse;"},
+	}
+	DefaultTableHeaderAttr = Attributes{
+		{Name: "style", Value: "border-width: 1px;padding: 8px;border-style: solid;border-color: #666666;background-color: #dedede;"},
+	}
+	DefaultTableDataAttr = Attributes{
+		{Name: "style", Value: "border-width: 1px;padding: 8px;border-style: solid;border-color: #666666;background-color: #ffffff"},
+	}
+)

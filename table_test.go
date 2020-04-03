@@ -12,7 +12,6 @@ import (
 )
 
 func TestTable_Render(t1 *testing.T) {
-
 	type fields struct {
 		Data    []interface{}
 		Columns []Column
@@ -46,9 +45,8 @@ func TestTable_Render(t1 *testing.T) {
 	}
 	for _, tt := range tests {
 		t1.Run(tt.name, func(t1 *testing.T) {
-			t := Table{
-				Data: tt.fields.Data,
-			}
+			t := NewTable()
+			t.Data = tt.fields.Data
 			got := bytes.NewBuffer(nil)
 			err := t.Render(got)
 			if (err != nil) != tt.wantErr {
@@ -61,8 +59,8 @@ func TestTable_Render(t1 *testing.T) {
 			t1.Log(got.String())
 
 			dir := "output"
-			_ = os.Mkdir(dir, os.ModeDir)
-			_ = ioutil.WriteFile(filepath.Join(dir, fmt.Sprintf("%s.html", tt.name)), got.Bytes(), 0644)
+			_ = os.Mkdir(dir, 0744)
+			_ = ioutil.WriteFile(filepath.Join(dir, fmt.Sprintf("TestTable_Render.%s.html", tt.name)), got.Bytes(), 0644)
 		})
 	}
 }

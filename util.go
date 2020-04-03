@@ -5,10 +5,6 @@ import (
 	"io"
 )
 
-type Element interface {
-	Render(writer io.Writer) error
-}
-
 type fmtWriter struct {
 	writer io.Writer
 	err    error
