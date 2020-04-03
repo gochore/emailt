@@ -9,7 +9,7 @@ import (
 )
 
 type Table struct {
-	Data       []interface{}
+	Dataset    []interface{}
 	Columns    []Column
 	Attr       Attributes
 	HeaderAttr Attributes
@@ -24,8 +24,8 @@ func NewTable() Table {
 	}
 }
 
-func (t Table) WithData(data []interface{}) Table {
-	t.Data = data
+func (t Table) WithDataset(dataset []interface{}) Table {
+	t.Dataset = dataset
 	return t
 }
 
@@ -35,16 +35,16 @@ func (t Table) WithColumns(columns []Column) Table {
 }
 
 func (t Table) Render(writer io.Writer) error {
-	if len(t.Data) == 0 {
+	if len(t.Dataset) == 0 {
 		return fmt.Errorf("empty data")
 	}
 
-	typ := reflect.TypeOf(t.Data[0])
+	typ := reflect.TypeOf(t.Dataset[0])
 	if typ.Kind() != reflect.Struct {
 		return fmt.Errorf("%v is not a struct", typ)
 	}
 
-	for i, v := range t.Data {
+	for i, v := range t.Dataset {
 		t := reflect.TypeOf(v)
 		if t != typ {
 			return fmt.Errorf("item %v is %v, not %v", i, t, typ)
@@ -88,7 +88,7 @@ func (t Table) Render(writer io.Writer) error {
 	}
 	render.Println("</tr>")
 
-	for _, row := range t.Data {
+	for _, row := range t.Dataset {
 		if err := rowTemplate.Execute(render, row); err != nil {
 			return fmt.Errorf("Execute: %w", err)
 		}

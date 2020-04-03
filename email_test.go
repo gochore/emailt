@@ -26,7 +26,7 @@ func TestEmail_Render(t *testing.T) {
 			fields: fields{
 				elements: []Element{
 					Table{
-						Data: []interface{}{
+						Dataset: []interface{}{
 							TestStruct1{
 								A: "a1",
 								B: 1,

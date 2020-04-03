@@ -13,7 +13,7 @@ import (
 
 func TestTable_Render(t1 *testing.T) {
 	type fields struct {
-		Data    []interface{}
+		Dataset []interface{}
 		Columns []Column
 	}
 	tests := []struct {
@@ -24,7 +24,7 @@ func TestTable_Render(t1 *testing.T) {
 		{
 			name: "regular",
 			fields: fields{
-				Data: []interface{}{
+				Dataset: []interface{}{
 					TestStruct1{
 						A: "a1",
 						B: 1,
@@ -45,7 +45,7 @@ func TestTable_Render(t1 *testing.T) {
 		{
 			name: "with_columns",
 			fields: fields{
-				Data: []interface{}{
+				Dataset: []interface{}{
 					TestStruct1{
 						A: "a1",
 						B: 1,
@@ -79,7 +79,7 @@ func TestTable_Render(t1 *testing.T) {
 	}
 	for _, tt := range tests {
 		t1.Run(tt.name, func(t1 *testing.T) {
-			t := NewTable().WithColumns(tt.fields.Columns).WithData(tt.fields.Data)
+			t := NewTable().WithColumns(tt.fields.Columns).WithDataset(tt.fields.Dataset)
 			got := bytes.NewBuffer(nil)
 			err := t.Render(got)
 			if (err != nil) != tt.wantErr {
