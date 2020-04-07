@@ -107,12 +107,12 @@ type Column struct {
 
 var (
 	DefaultTableAttr = Attributes{
-		{Name: "style", Value: "font-family: verdana,arial,sans-serif;font-size:14px;color:#333333;border-width: 1px;border-color: #666666;border-collapse: collapse;"},
+		{Name: "style", Value: "border:1px black solid; padding:3px 3px 3px 3px; border-collapse:collapse;"},
 	}
 	DefaultTableHeaderAttr = Attributes{
-		{Name: "style", Value: "border-width: 1px;padding: 8px;border-style: solid;border-color: #666666;background-color: #dedede;"},
+		{Name: "style", Value: "border:1px black solid; padding:3px 3px 3px 3px; border-collapse:collapse; background-color:#dedede;"},
 	}
 	DefaultTableDataAttr = Attributes{
-		{Name: "style", Value: "border-width: 1px;padding: 8px;border-style: solid;border-color: #666666;background-color: #ffffff"},
+		{Name: "style", Value: "border:1px black solid; padding:3px 3px 3px 3px; border-collapse:collapse;"},
 	}
 )
