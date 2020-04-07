@@ -5,11 +5,12 @@ import (
 	"html/template"
 	"io"
 	"reflect"
+	"sort"
 	"strings"
 )
 
 type Table struct {
-	Dataset    []interface{}
+	Dataset    interface{}
 	Columns    []Column
 	Attr       Attributes
 	HeaderAttr Attributes
@@ -24,7 +25,7 @@ func NewTable() Table {
 	}
 }
 
-func (t Table) WithDataset(dataset []interface{}) Table {
+func (t Table) WithDataset(dataset interface{}) Table {
 	t.Dataset = dataset
 	return t
 }
@@ -35,31 +36,58 @@ func (t Table) WithColumns(columns []Column) Table {
 }
 
 func (t Table) Render(writer io.Writer) error {
-	if len(t.Dataset) == 0 {
+	dataset := reflect.ValueOf(t.Dataset)
+	if dataset.Kind() != reflect.Slice {
+		return fmt.Errorf("%v is not a slice", dataset.Type())
+	}
+
+	if dataset.Len() == 0 {
 		return fmt.Errorf("empty data")
 	}
 
-	typ := reflect.TypeOf(t.Dataset[0])
-	if typ.Kind() != reflect.Struct {
+	mapItem := false
+	typ := dataset.Index(0).Type()
+	switch typ.Kind() {
+	case reflect.Map:
+		mapItem = true
+	case reflect.Struct:
+		// do nothing
+	default:
+		return fmt.Errorf("unsupported slice item type: %v", typ)
+	}
+	if typ.Kind() != reflect.Struct && typ.Kind() != reflect.Map {
 		return fmt.Errorf("%v is not a struct", typ)
 	}
 
-	for i, v := range t.Dataset {
-		t := reflect.TypeOf(v)
-		if t != typ {
+	for i := 0; i < dataset.Len(); i++ {
+		if t := dataset.Index(i).Type(); t != typ {
 			return fmt.Errorf("item %v is %v, not %v", i, t, typ)
 		}
 	}
 
 	columns := t.Columns
 	if len(columns) == 0 {
-		numField := typ.NumField()
-		for i := 0; i < numField; i++ {
-			field := typ.Field(i)
-			columns = append(columns, Column{
-				Name:     field.Name,
-				Template: fmt.Sprintf("{{.%s}}", field.Name),
-			})
+		if mapItem {
+			var keys []string
+			for _, v := range dataset.Index(0).MapKeys() {
+				keys = append(keys, fmt.Sprint(v.Interface()))
+			}
+			sort.Strings(keys)
+			for _, key := range keys {
+				columns = append(columns, Column{
+					Name:     key,
+					Template: fmt.Sprintf("{{.%s}}", key),
+				})
+			}
+		} else {
+			numField := typ.NumField()
+			for i := 0; i < numField; i++ {
+				field := typ.Field(i)
+				columns = append(columns, Column{
+					Name:     field.Name,
+					Template: fmt.Sprintf("{{.%s}}", field.Name),
+				})
+			}
 		}
 	}
 	var rowTemplate *template.Template
@@ -88,8 +116,8 @@ func (t Table) Render(writer io.Writer) error {
 	}
 	render.Println("</tr>")
 
-	for _, row := range t.Dataset {
-		if err := rowTemplate.Execute(render, row); err != nil {
+	for i := 0; i < dataset.Len(); i++ {
+		if err := rowTemplate.Execute(render, dataset.Index(i)); err != nil {
 			return fmt.Errorf("Execute: %w", err)
 		}
 		render.Println()
