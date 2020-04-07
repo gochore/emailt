@@ -22,7 +22,7 @@ func (e *Email) Render(writer io.Writer) error {
   <title></title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 </head>
-<body style="margin: 0; padding: 0;">
+<body>
 `)
 
 	for _, element := range e.elements {

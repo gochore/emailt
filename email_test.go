@@ -26,16 +26,16 @@ func TestEmail_Render(t *testing.T) {
 			fields: fields{
 				elements: []Element{
 					Table{
-						Dataset: []interface{}{
-							TestStruct1{
+						Dataset: []TestStruct1{
+							{
 								A: "a1",
 								B: 1,
 							},
-							TestStruct1{
+							{
 								A: "a2",
 								B: 2,
 							},
-							TestStruct1{
+							{
 								A: "a3",
 								B: 3,
 							},

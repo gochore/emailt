@@ -13,7 +13,7 @@ import (
 
 func TestTable_Render(t1 *testing.T) {
 	type fields struct {
-		Dataset []interface{}
+		Dataset interface{}
 		Columns []Column
 	}
 	tests := []struct {
@@ -24,16 +24,16 @@ func TestTable_Render(t1 *testing.T) {
 		{
 			name: "regular",
 			fields: fields{
-				Dataset: []interface{}{
-					TestStruct1{
+				Dataset: []TestStruct1{
+					{
 						A: "a1",
 						B: 1,
 					},
-					TestStruct1{
+					{
 						A: "a2",
 						B: 2,
 					},
-					TestStruct1{
+					{
 						A: "a3",
 						B: 3,
 					},
@@ -45,16 +45,16 @@ func TestTable_Render(t1 *testing.T) {
 		{
 			name: "with_columns",
 			fields: fields{
-				Dataset: []interface{}{
-					TestStruct1{
+				Dataset: []TestStruct1{
+					{
 						A: "a1",
 						B: 1,
 					},
-					TestStruct1{
+					{
 						A: "a2",
 						B: 2,
 					},
-					TestStruct1{
+					{
 						A: "a3",
 						B: 3,
 					},
@@ -73,6 +73,27 @@ func TestTable_Render(t1 *testing.T) {
 						Template: "{{.A}}({{.B}})",
 					},
 				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "map_dataset",
+			fields: fields{
+				Dataset: []map[string]interface{}{
+					{
+						"A": "a1",
+						"B": 1,
+					},
+					{
+						"A": "a2",
+						"B": 2,
+					},
+					{
+						"A": "a3",
+						"B": 3,
+					},
+				},
+				Columns: nil,
 			},
 			wantErr: false,
 		},
