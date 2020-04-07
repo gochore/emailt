@@ -8,8 +8,9 @@ type Email struct {
 	elements []Element
 }
 
-func (e *Email) AddElements(element ...Element) {
+func (e *Email) AddElements(element ...Element) *Email {
 	e.elements = append(e.elements, element...)
+	return e
 }
 
 func (e *Email) Render(writer io.Writer) error {

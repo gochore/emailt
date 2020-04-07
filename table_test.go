@@ -11,6 +11,11 @@ import (
 	"golang.org/x/net/html"
 )
 
+type TestStruct1 struct {
+	A string
+	B int
+}
+
 func TestTable_Render(t1 *testing.T) {
 	type fields struct {
 		Dataset interface{}

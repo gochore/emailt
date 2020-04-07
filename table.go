@@ -9,9 +9,28 @@ import (
 	"strings"
 )
 
+var (
+	DefaultTableAttr = Attributes{
+		{Name: "style", Value: "border:1px black solid; padding:3px 3px 3px 3px; border-collapse:collapse;"},
+	}
+	DefaultTableHeaderAttr = Attributes{
+		{Name: "style", Value: "border:1px black solid; padding:3px 3px 3px 3px; border-collapse:collapse; background-color:#dedede;"},
+	}
+	DefaultTableDataAttr = Attributes{
+		{Name: "style", Value: "border:1px black solid; padding:3px 3px 3px 3px; border-collapse:collapse;"},
+	}
+)
+
+type Column struct {
+	Name     string
+	Template string
+}
+
+type Columns []Column
+
 type Table struct {
 	Dataset    interface{}
-	Columns    []Column
+	Columns    Columns
 	Attr       Attributes
 	HeaderAttr Attributes
 	DataAttr   Attributes
@@ -30,7 +49,7 @@ func (t Table) WithDataset(dataset interface{}) Table {
 	return t
 }
 
-func (t Table) WithColumns(columns []Column) Table {
+func (t Table) WithColumns(columns Columns) Table {
 	t.Columns = columns
 	return t
 }
@@ -127,20 +146,3 @@ func (t Table) Render(writer io.Writer) error {
 
 	return render.Err()
 }
-
-type Column struct {
-	Name     string
-	Template string
-}
-
-var (
-	DefaultTableAttr = Attributes{
-		{Name: "style", Value: "border:1px black solid; padding:3px 3px 3px 3px; border-collapse:collapse;"},
-	}
-	DefaultTableHeaderAttr = Attributes{
-		{Name: "style", Value: "border:1px black solid; padding:3px 3px 3px 3px; border-collapse:collapse; background-color:#dedede;"},
-	}
-	DefaultTableDataAttr = Attributes{
-		{Name: "style", Value: "border:1px black solid; padding:3px 3px 3px 3px; border-collapse:collapse;"},
-	}
-)
