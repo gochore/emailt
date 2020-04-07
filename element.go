@@ -30,7 +30,7 @@ func (e TemplateElement) Render(writer io.Writer, themes ...Theme) error {
 	}
 	buffer := &bytes.Buffer{}
 	if err := t.Execute(buffer, e.Data); err != nil {
-		return err
+		return fmt.Errorf("template execute: %w", err)
 	}
 	return htmlRender(buffer, writer, mergeThemes(themes))
 }

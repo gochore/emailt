@@ -80,13 +80,13 @@ func htmlRender(reader io.Reader, writer io.Writer, theme Theme) error {
 		Data:     "div",
 	})
 	if err != nil {
-		return err
+		return fmt.Errorf("ParseFragment: %w", err)
 	}
 
 	for _, node := range nodes {
 		writeStyles(node, theme)
 		if err := html.Render(writer, node); err != nil {
-			return err
+			return fmt.Errorf("html render: %w", err)
 		}
 	}
 	return nil

@@ -107,7 +107,7 @@ func (t Table) Render(writer io.Writer, themes ...Theme) error {
 				Template: column.Template,
 			}
 			if err := e.Render(writer, theme); err != nil {
-				return err
+				return fmt.Errorf("render: %w", err)
 			}
 			render.Println("\n</td>")
 		}

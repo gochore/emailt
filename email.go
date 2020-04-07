@@ -1,6 +1,7 @@
 package emailt
 
 import (
+	"fmt"
 	"io"
 )
 
@@ -47,7 +48,7 @@ func (e *Email) Render(writer io.Writer) error {
 
 	for _, element := range e.elements {
 		if err := element.Render(writer, e.theme); err != nil {
-			return err
+			return fmt.Errorf("render: %w", err)
 		}
 	}
 
