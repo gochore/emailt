@@ -2,23 +2,9 @@ package emailt
 
 import (
 	"fmt"
-	"html/template"
 	"io"
 	"reflect"
 	"sort"
-	"strings"
-)
-
-var (
-	DefaultTableAttr = Attributes{
-		{Name: "style", Value: "border:1px black solid; padding:3px 3px 3px 3px; border-collapse:collapse;"},
-	}
-	DefaultTableHeaderAttr = Attributes{
-		{Name: "style", Value: "border:1px black solid; padding:3px 3px 3px 3px; border-collapse:collapse; background-color:#dedede;"},
-	}
-	DefaultTableDataAttr = Attributes{
-		{Name: "style", Value: "border:1px black solid; padding:3px 3px 3px 3px; border-collapse:collapse;"},
-	}
 )
 
 type Column struct {
@@ -29,19 +15,8 @@ type Column struct {
 type Columns []Column
 
 type Table struct {
-	Dataset    interface{}
-	Columns    Columns
-	Attr       Attributes
-	HeaderAttr Attributes
-	DataAttr   Attributes
-}
-
-func NewTable() Table {
-	return Table{
-		Attr:       DefaultTableAttr,
-		HeaderAttr: DefaultTableHeaderAttr,
-		DataAttr:   DefaultTableDataAttr,
-	}
+	Dataset interface{}
+	Columns Columns
 }
 
 func (t Table) WithDataset(dataset interface{}) Table {
@@ -54,7 +29,9 @@ func (t Table) WithColumns(columns Columns) Table {
 	return t
 }
 
-func (t Table) Render(writer io.Writer) error {
+func (t Table) Render(writer io.Writer, themes ...Theme) error {
+	theme := mergeThemes(themes)
+
 	dataset := reflect.ValueOf(t.Dataset)
 	if dataset.Kind() != reflect.Slice {
 		return fmt.Errorf("%v is not a slice", dataset.Type())
@@ -109,37 +86,32 @@ func (t Table) Render(writer io.Writer) error {
 			}
 		}
 	}
-	var rowTemplate *template.Template
-	{
-		rowBuilder := strings.Builder{}
-		rowBuilder.WriteString("<tr>\n")
-		for _, column := range columns {
-			rowBuilder.WriteString(fmt.Sprintf("<td %s>%s</td>\n", t.DataAttr, column.Template))
-		}
-		rowBuilder.WriteString("</tr>")
-		var err error
-		rowTemplate, err = template.New("").Parse(rowBuilder.String())
-		if err != nil {
-			return fmt.Errorf("Parse: %w", err)
-		}
-	}
 
 	render := newFmtWriter(writer)
 
-	render.Printlnf("<table %s>", t.Attr.String())
+	render.Printlnf("<table %s>", theme.Attributes("table"))
 
 	render.Println("<tr>")
 
 	for _, column := range columns {
-		render.Printlnf("<th %s>%s</th>", t.HeaderAttr, column.Name)
+		render.Printlnf("<th %s>%s</th>", theme.Attributes("th"), column.Name)
 	}
 	render.Println("</tr>")
 
 	for i := 0; i < dataset.Len(); i++ {
-		if err := rowTemplate.Execute(render, dataset.Index(i)); err != nil {
-			return fmt.Errorf("Execute: %w", err)
+		render.Println("<tr>")
+		for _, column := range columns {
+			render.Printlnf("<td %s>", theme.Attributes("td"))
+			e := TemplateElement{
+				Data:     dataset.Index(i),
+				Template: column.Template,
+			}
+			if err := e.Render(writer, theme); err != nil {
+				return err
+			}
+			render.Println("\n</td>")
 		}
-		render.Println()
+		render.Println("</tr>")
 	}
 
 	render.Println("</table>")

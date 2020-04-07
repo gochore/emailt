@@ -54,9 +54,6 @@ func TestEmail_Render(t *testing.T) {
 								Template: "{{.A}}({{.B}})",
 							},
 						},
-						Attr:       DefaultTableAttr,
-						HeaderAttr: DefaultTableHeaderAttr,
-						DataAttr:   DefaultTableDataAttr,
 					},
 				},
 			},
@@ -65,9 +62,7 @@ func TestEmail_Render(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			e := &Email{
-				elements: tt.fields.elements,
-			}
+			e := NewEmail().AddElements(tt.fields.elements...)
 			got := bytes.NewBuffer(nil)
 			err := e.Render(got)
 			if (err != nil) != tt.wantErr {

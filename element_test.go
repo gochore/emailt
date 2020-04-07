@@ -9,6 +9,7 @@ func TestStringElement_Render(t *testing.T) {
 	tests := []struct {
 		name       string
 		e          StringElement
+		style      Theme
 		wantWriter string
 		wantErr    bool
 	}{
@@ -18,11 +19,25 @@ func TestStringElement_Render(t *testing.T) {
 			wantWriter: "<p>test</p>",
 			wantErr:    false,
 		},
+		{
+			name: "with_style",
+			e:    "<p>test</p>",
+			style: MapTheme{
+				"p": Attributes{
+					{
+						Name:  "style",
+						Value: "background-color:#dedede;",
+					},
+				},
+			},
+			wantWriter: `<p style="background-color:#dedede;">test</p>`,
+			wantErr:    false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			writer := &bytes.Buffer{}
-			err := tt.e.Render(writer)
+			err := tt.e.Render(writer, tt.style)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Render() error = %v, wantErr %v", err, tt.wantErr)
 				return

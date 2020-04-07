@@ -6,6 +6,25 @@ import (
 
 type Email struct {
 	elements []Element
+	theme    Theme
+}
+
+type Option func(email *Email)
+
+func WithTheme(theme Theme) Option {
+	return func(email *Email) {
+		email.theme = theme
+	}
+}
+
+func NewEmail(options ...Option) *Email {
+	ret := &Email{
+		theme: DefaultTheme,
+	}
+	for _, option := range options {
+		option(ret)
+	}
+	return ret
 }
 
 func (e *Email) AddElements(element ...Element) *Email {
@@ -27,7 +46,7 @@ func (e *Email) Render(writer io.Writer) error {
 `)
 
 	for _, element := range e.elements {
-		if err := element.Render(writer); err != nil {
+		if err := element.Render(writer, e.theme); err != nil {
 			return err
 		}
 	}
