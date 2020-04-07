@@ -11,6 +11,11 @@ import (
 	"golang.org/x/net/html"
 )
 
+type TestStruct1 struct {
+	A string
+	B int
+}
+
 func TestTable_Render(t1 *testing.T) {
 	type fields struct {
 		Dataset interface{}
@@ -100,7 +105,7 @@ func TestTable_Render(t1 *testing.T) {
 	}
 	for _, tt := range tests {
 		t1.Run(tt.name, func(t1 *testing.T) {
-			t := NewTable().WithColumns(tt.fields.Columns).WithDataset(tt.fields.Dataset)
+			t := Table{}.WithColumns(tt.fields.Columns).WithDataset(tt.fields.Dataset)
 			got := bytes.NewBuffer(nil)
 			err := t.Render(got)
 			if (err != nil) != tt.wantErr {

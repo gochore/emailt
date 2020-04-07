@@ -1,20 +1,21 @@
 package emailt
 
 import (
+	"bytes"
 	"fmt"
 	"html/template"
 	"io"
+	"strings"
 )
 
 type Element interface {
-	Render(writer io.Writer) error
+	Render(writer io.Writer, themes ...Theme) error
 }
 
 type StringElement string
 
-func (e StringElement) Render(writer io.Writer) error {
-	_, err := writer.Write([]byte(e))
-	return err
+func (e StringElement) Render(writer io.Writer, themes ...Theme) error {
+	return htmlRender(strings.NewReader(string(e)), writer, mergeThemes(themes))
 }
 
 type TemplateElement struct {
@@ -22,10 +23,14 @@ type TemplateElement struct {
 	Template string
 }
 
-func (e TemplateElement) Render(writer io.Writer) error {
+func (e TemplateElement) Render(writer io.Writer, themes ...Theme) error {
 	t, err := template.New("").Parse(e.Template)
 	if err != nil {
 		return fmt.Errorf("parse template: %w", err)
 	}
-	return t.Execute(writer, e.Data)
+	buffer := &bytes.Buffer{}
+	if err := t.Execute(buffer, e.Data); err != nil {
+		return fmt.Errorf("template execute: %w", err)
+	}
+	return htmlRender(buffer, writer, mergeThemes(themes))
 }

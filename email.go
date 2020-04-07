@@ -1,15 +1,36 @@
 package emailt
 
 import (
+	"fmt"
 	"io"
 )
 
 type Email struct {
 	elements []Element
+	theme    Theme
 }
 
-func (e *Email) AddElements(element ...Element) {
+type Option func(email *Email)
+
+func WithTheme(theme Theme) Option {
+	return func(email *Email) {
+		email.theme = theme
+	}
+}
+
+func NewEmail(options ...Option) *Email {
+	ret := &Email{
+		theme: DefaultTheme,
+	}
+	for _, option := range options {
+		option(ret)
+	}
+	return ret
+}
+
+func (e *Email) AddElements(element ...Element) *Email {
 	e.elements = append(e.elements, element...)
+	return e
 }
 
 func (e *Email) Render(writer io.Writer) error {
@@ -26,8 +47,8 @@ func (e *Email) Render(writer io.Writer) error {
 `)
 
 	for _, element := range e.elements {
-		if err := element.Render(writer); err != nil {
-			return err
+		if err := element.Render(writer, e.theme); err != nil {
+			return fmt.Errorf("render: %w", err)
 		}
 	}
 
