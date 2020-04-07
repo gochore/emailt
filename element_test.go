@@ -75,6 +75,30 @@ func TestTemplateElement_Render(t *testing.T) {
 			wantWriter: "A:a, B:1",
 			wantErr:    false,
 		},
+		{
+			name: "invalid_template",
+			fields: fields{
+				Data: struct {
+					A string
+					B int
+				}{
+					A: "a",
+					B: 1,
+				},
+				Template: "A:{{.A}}, B:{{.B}",
+			},
+			wantWriter: "",
+			wantErr:    true,
+		},
+		{
+			name: "invalid_data",
+			fields: fields{
+				Data:     "test",
+				Template: "A:{{.A}}, B:{{.B}}",
+			},
+			wantWriter: "",
+			wantErr:    true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
