@@ -3,6 +3,7 @@ package emailt
 import (
 	"bytes"
 	"testing"
+	"time"
 )
 
 func TestStringElement_Render(t *testing.T) {
@@ -114,6 +115,34 @@ func TestTemplateElement_Render(t *testing.T) {
 			}
 			if gotWriter := writer.String(); gotWriter != tt.wantWriter {
 				t.Errorf("Render() gotWriter = %v, want %v", gotWriter, tt.wantWriter)
+			}
+		})
+	}
+}
+
+func TestNewStringElement(t *testing.T) {
+	type args struct {
+		format string
+		a      []interface{}
+	}
+	tests := []struct {
+		name string
+		args args
+		want StringElement
+	}{
+		{
+			name: "regular",
+			args: args{
+				format: "%v %v",
+				a:      []interface{}{1, time.Minute},
+			},
+			want: "1 1m0s",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := NewStringElement(tt.args.format, tt.args.a...); got != tt.want {
+				t.Errorf("NewStringElement() = %v, want %v", got, tt.want)
 			}
 		})
 	}
