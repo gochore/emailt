@@ -14,6 +14,10 @@ type Element interface {
 
 type StringElement string
 
+func NewStringElement(format string, a ...interface{}) StringElement {
+	return StringElement(fmt.Sprintf(format, a...))
+}
+
 func (e StringElement) Render(writer io.Writer, themes ...Theme) error {
 	return htmlRender(strings.NewReader(string(e)), writer, mergeThemes(themes))
 }
