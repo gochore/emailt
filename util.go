@@ -13,15 +13,20 @@ type fmtWriter struct {
 	err    error
 }
 
-func (w fmtWriter) Write(p []byte) (n int, err error) {
-	return w.writer.Write(p)
-}
-
 func newFmtWriter(writer io.Writer) *fmtWriter {
 	return &fmtWriter{
 		writer: writer,
 		err:    nil,
 	}
+}
+
+func (w fmtWriter) Write(p []byte) (n int, err error) {
+	if w.err != nil {
+		return 0, w.err
+	}
+	n, err = w.writer.Write(p)
+	w.err = err
+	return
 }
 
 func (w *fmtWriter) Err() error {
@@ -43,10 +48,14 @@ func (w *fmtWriter) Println(a ...interface{}) {
 }
 
 func (w *fmtWriter) Printlnf(format string, a ...interface{}) {
+	w.Printf(format+"\n", a...)
+}
+
+func (w *fmtWriter) Printf(format string, a ...interface{}) {
 	if w.err != nil {
 		return
 	}
-	_, w.err = fmt.Fprintf(w.writer, format+"\n", a...)
+	_, w.err = fmt.Fprintf(w.writer, format, a...)
 }
 
 func writeStyles(node *html.Node, theme Theme) {
