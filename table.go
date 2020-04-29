@@ -15,24 +15,26 @@ type Column struct {
 type Columns []Column
 
 type Table struct {
-	Dataset interface{}
-	Columns Columns
+	dataset interface{}
+	columns Columns
 }
 
-func (t Table) WithDataset(dataset interface{}) Table {
-	t.Dataset = dataset
-	return t
+func NewTable() *Table {
+	return &Table{}
 }
 
-func (t Table) WithColumns(columns Columns) Table {
-	t.Columns = columns
-	return t
+func (t *Table) SetDataset(dataset interface{}) {
+	t.dataset = dataset
 }
 
-func (t Table) Render(writer io.Writer, themes ...Theme) error {
+func (t *Table) SetColumns(columns Columns) {
+	t.columns = columns
+}
+
+func (t *Table) Render(writer io.Writer, themes ...Theme) error {
 	theme := mergeThemes(themes)
 
-	dataset := reflect.ValueOf(t.Dataset)
+	dataset := reflect.ValueOf(t.dataset)
 	if dataset.Kind() != reflect.Slice {
 		return fmt.Errorf("%v is not a slice", dataset.Type())
 	}
@@ -61,7 +63,7 @@ func (t Table) Render(writer io.Writer, themes ...Theme) error {
 		}
 	}
 
-	columns := t.Columns
+	columns := t.columns
 	if len(columns) == 0 {
 		if mapItem {
 			var keys []string

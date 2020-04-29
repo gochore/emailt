@@ -25,8 +25,8 @@ func TestEmail_Render(t *testing.T) {
 			name: "regular",
 			fields: fields{
 				elements: []Element{
-					Table{
-						Dataset: []TestStruct1{
+					&Table{
+						dataset: []TestStruct1{
 							{
 								A: "a1",
 								B: 1,
@@ -40,7 +40,7 @@ func TestEmail_Render(t *testing.T) {
 								B: 3,
 							},
 						},
-						Columns: []Column{
+						columns: []Column{
 							{
 								Name:     "列1",
 								Template: "{{.A}}",
