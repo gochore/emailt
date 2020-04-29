@@ -2,11 +2,9 @@ package emailt
 
 import (
 	"fmt"
-	"io"
-	"strings"
 )
 
-type Headline string
+type Headline = StringElement
 
 func NewHeadline(level int, format string, a ...interface{}) Headline {
 	if level < 1 {
@@ -17,8 +15,4 @@ func NewHeadline(level int, format string, a ...interface{}) Headline {
 	}
 	format = fmt.Sprintf("<h%d>%s</h%d>", level, format, level)
 	return Headline(fmt.Sprintf(format, a...))
-}
-
-func (h Headline) Render(writer io.Writer, themes ...Theme) error {
-	return htmlRender(strings.NewReader(string(h)), writer, mergeThemes(themes))
 }
