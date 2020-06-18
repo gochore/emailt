@@ -568,7 +568,7 @@ func TestStrong(t *testing.T) {
 	}
 }
 
-func TestNesting(t *testing.T) {
+func TestHtml_Str(t *testing.T) {
 	var want Html = `<a href="/a"><b><code><del><em><h1><i><p>hello</p></i></h1></em></del></code></b></a>`
 	got := A("/a", B(Code(Del(Em(H(1, I(P("hello").Str()).Str()).Str()).Str()).Str()).Str()).Str())
 	if got != want {
