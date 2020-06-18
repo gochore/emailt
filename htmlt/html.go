@@ -2,13 +2,32 @@ package htmlt
 
 import (
 	"fmt"
+	"io"
+	"strings"
+
+	"github.com/gochore/emailt/internal/rend"
+	"github.com/gochore/emailt/style"
 )
 
-type Html = string
+type Html string
 
 // Sprintf return a html element
 func Sprintf(format string, a ...interface{}) Html {
 	return Html(fmt.Sprintf(format, a...))
+}
+
+// Render implement email.Element
+func (e Html) Render(writer io.Writer, themes ...style.Theme) error {
+	errPrefix := "Html.Render: "
+	if err := rend.RenderTheme(strings.NewReader(string(e)), writer, rend.MergeThemes(themes)); err != nil {
+		return fmt.Errorf(errPrefix+"%w", err)
+	}
+	return nil
+}
+
+// Str return string value of Html
+func (e Html) Str() string {
+	return string(e)
 }
 
 // T return a html element with specified tag
