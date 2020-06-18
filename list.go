@@ -3,6 +3,9 @@ package emailt
 import (
 	"fmt"
 	"io"
+
+	"github.com/gochore/emailt/internal/rend"
+	"github.com/gochore/emailt/style"
 )
 
 type List struct {
@@ -28,10 +31,12 @@ func (l *List) Add(item ...Element) {
 	l.items = append(l.items, item...)
 }
 
-func (l *List) Render(writer io.Writer, themes ...Theme) error {
-	theme := mergeThemes(themes)
+func (l *List) Render(writer io.Writer, themes ...style.Theme) error {
+	errPrefix := "List.Render: "
 
-	render := newFmtWriter(writer)
+	theme := rend.MergeThemes(themes)
+
+	render := rend.NewFmtWriter(writer)
 
 	tag := "ul"
 	if l.ordered {
@@ -43,12 +48,15 @@ func (l *List) Render(writer io.Writer, themes ...Theme) error {
 	for _, item := range l.items {
 		render.Printf("<li %s>", theme.Attributes("li"))
 		if err := item.Render(render, theme); err != nil {
-			return fmt.Errorf("render: %w", err)
+			return fmt.Errorf(errPrefix+"render li: %w", err)
 		}
 		render.Printlnf("</li>")
 	}
 
 	render.Printlnf("</%s>", tag)
 
-	return render.Err()
+	if err := render.Err(); err != nil {
+		return fmt.Errorf(errPrefix+"%w", err)
+	}
+	return nil
 }

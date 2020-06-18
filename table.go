@@ -5,6 +5,10 @@ import (
 	"io"
 	"reflect"
 	"sort"
+	"text/template"
+
+	"github.com/gochore/emailt/internal/rend"
+	"github.com/gochore/emailt/style"
 )
 
 type Column struct {
@@ -17,6 +21,7 @@ type Columns []Column
 type Table struct {
 	dataset interface{}
 	columns Columns
+	funcs   template.FuncMap
 }
 
 func NewTable() *Table {
@@ -31,16 +36,22 @@ func (t *Table) SetColumns(columns Columns) {
 	t.columns = columns
 }
 
-func (t *Table) Render(writer io.Writer, themes ...Theme) error {
-	theme := mergeThemes(themes)
+func (t *Table) SetFuncs(funcs template.FuncMap) {
+	t.funcs = funcs
+}
+
+func (t *Table) Render(writer io.Writer, themes ...style.Theme) error {
+	errPrefix := "Table.Render: "
+
+	theme := rend.MergeThemes(themes)
 
 	dataset := reflect.ValueOf(t.dataset)
 	if dataset.Kind() != reflect.Slice {
-		return fmt.Errorf("%v is not a slice", dataset.Type())
+		return fmt.Errorf(errPrefix+"%v is not a slice", dataset.Type())
 	}
 
 	if dataset.Len() == 0 {
-		return fmt.Errorf("empty data")
+		return fmt.Errorf(errPrefix + "empty data")
 	}
 
 	mapItem := false
@@ -51,15 +62,15 @@ func (t *Table) Render(writer io.Writer, themes ...Theme) error {
 	case reflect.Struct:
 		// do nothing
 	default:
-		return fmt.Errorf("unsupported slice item type: %v", typ)
+		return fmt.Errorf(errPrefix+"unsupported slice item type: %v", typ)
 	}
 	if typ.Kind() != reflect.Struct && typ.Kind() != reflect.Map {
-		return fmt.Errorf("%v is not a struct", typ)
+		return fmt.Errorf(errPrefix+"%v is not a struct", typ)
 	}
 
 	for i := 0; i < dataset.Len(); i++ {
 		if t := dataset.Index(i).Type(); t != typ {
-			return fmt.Errorf("item %v is %v, not %v", i, t, typ)
+			return fmt.Errorf(errPrefix+"item %v is %v, not %v", i, t, typ)
 		}
 	}
 
@@ -89,7 +100,7 @@ func (t *Table) Render(writer io.Writer, themes ...Theme) error {
 		}
 	}
 
-	render := newFmtWriter(writer)
+	render := rend.NewFmtWriter(writer)
 
 	render.Printlnf("<table %s>", theme.Attributes("table"))
 
@@ -107,9 +118,10 @@ func (t *Table) Render(writer io.Writer, themes ...Theme) error {
 			e := TemplateElement{
 				Data:     dataset.Index(i),
 				Template: column.Template,
+				Funcs:    t.funcs,
 			}
 			if err := e.Render(writer, theme); err != nil {
-				return fmt.Errorf("render: %w", err)
+				return fmt.Errorf(errPrefix+"render td: %w", err)
 			}
 			render.Println("\n</td>")
 		}
@@ -118,5 +130,8 @@ func (t *Table) Render(writer io.Writer, themes ...Theme) error {
 
 	render.Println("</table>")
 
-	return render.Err()
+	if err := render.Err(); err != nil {
+		return fmt.Errorf(errPrefix+"%w", err)
+	}
+	return nil
 }

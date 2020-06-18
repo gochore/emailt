@@ -1,4 +1,4 @@
-package emailt
+package rend
 
 import (
 	"fmt"
@@ -6,21 +6,23 @@ import (
 
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
+
+	"github.com/gochore/emailt/style"
 )
 
-type fmtWriter struct {
+type FmtWriter struct {
 	writer io.Writer
 	err    error
 }
 
-func newFmtWriter(writer io.Writer) *fmtWriter {
-	return &fmtWriter{
+func NewFmtWriter(writer io.Writer) *FmtWriter {
+	return &FmtWriter{
 		writer: writer,
 		err:    nil,
 	}
 }
 
-func (w fmtWriter) Write(p []byte) (n int, err error) {
+func (w FmtWriter) Write(p []byte) (n int, err error) {
 	if w.err != nil {
 		return 0, w.err
 	}
@@ -29,72 +31,71 @@ func (w fmtWriter) Write(p []byte) (n int, err error) {
 	return
 }
 
-func (w *fmtWriter) Err() error {
+func (w *FmtWriter) Err() error {
 	return w.err
 }
 
-func (w *fmtWriter) Print(a ...interface{}) {
+func (w *FmtWriter) Print(a ...interface{}) {
 	if w.err != nil {
 		return
 	}
 	_, w.err = fmt.Fprint(w.writer, a...)
 }
 
-func (w *fmtWriter) Println(a ...interface{}) {
+func (w *FmtWriter) Println(a ...interface{}) {
 	if w.err != nil {
 		return
 	}
 	_, w.err = fmt.Fprintln(w.writer, a...)
 }
 
-func (w *fmtWriter) Printlnf(format string, a ...interface{}) {
+func (w *FmtWriter) Printlnf(format string, a ...interface{}) {
 	w.Printf(format+"\n", a...)
 }
 
-func (w *fmtWriter) Printf(format string, a ...interface{}) {
+func (w *FmtWriter) Printf(format string, a ...interface{}) {
 	if w.err != nil {
 		return
 	}
 	_, w.err = fmt.Fprintf(w.writer, format, a...)
 }
 
-func writeStyles(node *html.Node, theme Theme) {
+func WriteTheme(node *html.Node, theme style.Theme) {
 	if node == nil {
 		return
 	}
 	if node.Type == html.ElementNode {
-		attrs := theme.Attributes(node.Data).Merge(parseHtmlAttributes(node.Attr))
-		node.Attr = attrs.exportHtmlAttributes()
+		node.Attr = theme.Attributes(node.Data).Merge(node.Attr)
 	}
-	writeStyles(node.FirstChild, theme)
-	writeStyles(node.NextSibling, theme)
+	WriteTheme(node.FirstChild, theme)
+	WriteTheme(node.NextSibling, theme)
 }
 
-func mergeThemes(themes []Theme) Theme {
+func MergeThemes(themes []style.Theme) style.Theme {
 	theme := ChainTheme{}
 	for _, m := range themes {
 		theme = ChainTheme{
-			upstream: theme,
-			inner:    m,
+			Upstream: theme,
+			Inner:    m,
 		}
 	}
 	return theme
 }
 
-func htmlRender(reader io.Reader, writer io.Writer, theme Theme) error {
+func RenderTheme(reader io.Reader, writer io.Writer, theme style.Theme) error {
 	nodes, err := html.ParseFragment(reader, &html.Node{
 		Type:     html.ElementNode,
 		DataAtom: atom.Div,
 		Data:     "div",
 	})
 	if err != nil {
-		return fmt.Errorf("ParseFragment: %w", err)
+		return fmt.Errorf("html.ParseFragment: %w", err)
 	}
 
 	for _, node := range nodes {
-		writeStyles(node, theme)
+		WriteTheme(node, theme)
 		if err := html.Render(writer, node); err != nil {
-			return fmt.Errorf("html render: %w", err)
+			return fmt.Errorf("html.Render: %w", err)
 		}
 	}
 	return nil

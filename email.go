@@ -3,16 +3,19 @@ package emailt
 import (
 	"fmt"
 	"io"
+
+	"github.com/gochore/emailt/internal/rend"
+	"github.com/gochore/emailt/style"
 )
 
 type Email struct {
 	elements []Element
-	theme    Theme
+	theme    style.Theme
 }
 
 type Option func(email *Email)
 
-func WithTheme(theme Theme) Option {
+func WithTheme(theme style.Theme) Option {
 	return func(email *Email) {
 		email.theme = theme
 	}
@@ -34,7 +37,7 @@ func (e *Email) AddElements(element ...Element) *Email {
 }
 
 func (e *Email) Render(writer io.Writer) error {
-	render := newFmtWriter(writer)
+	render := rend.NewFmtWriter(writer)
 	render.Print(`
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">

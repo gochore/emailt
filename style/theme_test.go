@@ -1,4 +1,4 @@
-package emailt
+package style
 
 import (
 	"reflect"
@@ -15,12 +15,12 @@ func TestAttributes_String(t *testing.T) {
 			name: "regular",
 			as: Attributes{
 				{
-					Name:  "a",
-					Value: "aa",
+					Key: "a",
+					Val: "aa",
 				},
 				{
-					Name:  "b",
-					Value: "bb",
+					Key: "b",
+					Val: "bb",
 				},
 			},
 			want: `a="aa" b="bb"`,
@@ -55,8 +55,8 @@ func TestMapTheme_Attributes(t *testing.T) {
 			t: MapTheme{
 				"a": Attributes{
 					{
-						Name:  "an",
-						Value: "av",
+						Key: "an",
+						Val: "av",
 					},
 				},
 			},
@@ -65,8 +65,8 @@ func TestMapTheme_Attributes(t *testing.T) {
 			},
 			want: Attributes{
 				{
-					Name:  "an",
-					Value: "av",
+					Key: "an",
+					Val: "av",
 				},
 			},
 		},
@@ -103,8 +103,8 @@ func TestMapTheme_Exists(t *testing.T) {
 			t: MapTheme{
 				"a": Attributes{
 					{
-						Name:  "an",
-						Value: "av",
+						Key: "an",
+						Val: "av",
 					},
 				},
 			},
@@ -126,84 +126,6 @@ func TestMapTheme_Exists(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := tt.t.Exists(tt.args.tag); got != tt.want {
 				t.Errorf("Exists() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestChainTheme_Exists(t1 *testing.T) {
-	type fields struct {
-		upstream Theme
-		inner    Theme
-	}
-	type args struct {
-		tag string
-	}
-	tests := []struct {
-		name   string
-		fields fields
-		args   args
-		want   bool
-	}{
-		{
-			name: "regular",
-			fields: fields{
-				upstream: MapTheme{
-					"b": Attributes{
-						{
-							Name:  "bn",
-							Value: "bv",
-						},
-					},
-				},
-				inner: MapTheme{
-					"a": Attributes{
-						{
-							Name:  "an",
-							Value: "av",
-						},
-					},
-				},
-			},
-			args: args{
-				tag: "a",
-			},
-			want: true,
-		},
-		{
-			name: "not exist",
-			fields: fields{
-				upstream: MapTheme{
-					"b": Attributes{
-						{
-							Name:  "bn",
-							Value: "bv",
-						},
-					},
-				},
-				inner: MapTheme{
-					"a": Attributes{
-						{
-							Name:  "an",
-							Value: "av",
-						},
-					},
-				},
-			},
-			args: args{
-				tag: "c",
-			},
-			want: false,
-		},
-	}
-	for _, tt := range tests {
-		t1.Run(tt.name, func(t1 *testing.T) {
-			t := ChainTheme{
-				upstream: tt.fields.upstream,
-				inner:    tt.fields.inner,
-			}
-			if got := t.Exists(tt.args.tag); got != tt.want {
-				t1.Errorf("Exists() = %v, want %v", got, tt.want)
 			}
 		})
 	}
