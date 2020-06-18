@@ -31,7 +31,7 @@ func NewEmail(options ...Option) *Email {
 	return ret
 }
 
-func (e *Email) AddElements(element ...Element) *Email {
+func (e *Email) Add(element ...Element) *Email {
 	e.elements = append(e.elements, element...)
 	return e
 }

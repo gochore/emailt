@@ -115,7 +115,7 @@ func (t *Table) Render(writer io.Writer, themes ...style.Theme) error {
 		render.Println("<tr>")
 		for _, column := range columns {
 			render.Printlnf("<td %s>", theme.Attributes("td"))
-			e := TemplateElement{
+			e := Template{
 				Data:     dataset.Index(i),
 				Template: column.Template,
 				Funcs:    t.funcs,
