@@ -14,14 +14,14 @@ type Element interface {
 	Render(writer io.Writer, themes ...style.Theme) error
 }
 
-type TemplateElement struct {
+type Template struct {
 	Data     interface{}
 	Template string
 	Funcs    template.FuncMap
 }
 
-func (e TemplateElement) Render(writer io.Writer, themes ...style.Theme) error {
-	errPrefix := "TemplateElement.Render: "
+func (e Template) Render(writer io.Writer, themes ...style.Theme) error {
+	errPrefix := "Template.Render: "
 
 	t, err := template.New("").Funcs(e.Funcs).Parse(e.Template)
 	if err != nil {

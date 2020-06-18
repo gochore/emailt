@@ -55,9 +55,9 @@ func TestList_Render(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			l := NewUnorderedList()
+			l := NewUnordered()
 			if tt.fields.ordered {
-				l = NewOrderedList()
+				l = NewOrdered()
 			}
 			l.Add(tt.fields.items...)
 			writer := &bytes.Buffer{}

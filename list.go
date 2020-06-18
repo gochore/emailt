@@ -13,11 +13,11 @@ type List struct {
 	ordered bool
 }
 
-func NewUnorderedList() *List {
+func NewUnordered() *List {
 	return &List{}
 }
 
-func NewOrderedList() *List {
+func NewOrdered() *List {
 	return &List{
 		ordered: true,
 	}

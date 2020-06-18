@@ -62,7 +62,7 @@ func TestEmail_Render(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			e := NewEmail().AddElements(tt.fields.elements...)
+			e := NewEmail().Add(tt.fields.elements...)
 			got := bytes.NewBuffer(nil)
 			err := e.Render(got)
 			if (err != nil) != tt.wantErr {
