@@ -6,7 +6,9 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
+	"text/template"
 
 	"golang.org/x/net/html"
 )
@@ -20,6 +22,7 @@ func TestTable_Render(t1 *testing.T) {
 	type fields struct {
 		Dataset interface{}
 		Columns []Column
+		Funcs   template.FuncMap
 	}
 	tests := []struct {
 		name    string
@@ -102,12 +105,50 @@ func TestTable_Render(t1 *testing.T) {
 			},
 			wantErr: false,
 		},
+		{
+			name: "with_funcs",
+			fields: fields{
+				Dataset: []TestStruct1{
+					{
+						A: "hello",
+						B: 1,
+					},
+					{
+						A: "a2",
+						B: 2,
+					},
+					{
+						A: "a3",
+						B: 3,
+					},
+				},
+				Columns: []Column{
+					{
+						Name:     "列1",
+						Template: "{{title .A}}",
+					},
+					{
+						Name:     "列2",
+						Template: "{{.B}}",
+					},
+					{
+						Name:     "列3",
+						Template: "{{.A}}({{.B}})",
+					},
+				},
+				Funcs: template.FuncMap{
+					"title": strings.Title,
+				},
+			},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t1.Run(tt.name, func(t1 *testing.T) {
 			t := NewTable()
 			t.SetColumns(tt.fields.Columns)
 			t.SetDataset(tt.fields.Dataset)
+			t.SetFuncs(tt.fields.Funcs)
 			got := bytes.NewBuffer(nil)
 			err := t.Render(got)
 			if (err != nil) != tt.wantErr {

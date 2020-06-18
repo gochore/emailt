@@ -3,8 +3,8 @@ package emailt
 import (
 	"bytes"
 	"fmt"
-	"html/template"
 	"io"
+	"text/template"
 
 	"github.com/gochore/emailt/internal/rend"
 	"github.com/gochore/emailt/style"
@@ -17,12 +17,13 @@ type Element interface {
 type TemplateElement struct {
 	Data     interface{}
 	Template string
+	Funcs    template.FuncMap
 }
 
 func (e TemplateElement) Render(writer io.Writer, themes ...style.Theme) error {
 	errPrefix := "TemplateElement.Render: "
 
-	t, err := template.New("").Parse(e.Template)
+	t, err := template.New("").Funcs(e.Funcs).Parse(e.Template)
 	if err != nil {
 		return fmt.Errorf(errPrefix+"parse template: %w", err)
 	}

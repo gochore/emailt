@@ -2,13 +2,16 @@ package emailt
 
 import (
 	"bytes"
+	"strings"
 	"testing"
+	"text/template"
 )
 
 func TestTemplateElement_Render(t *testing.T) {
 	type fields struct {
 		Data     interface{}
 		Template string
+		Funcs    template.FuncMap
 	}
 	tests := []struct {
 		name       string
@@ -55,12 +58,31 @@ func TestTemplateElement_Render(t *testing.T) {
 			wantWriter: "",
 			wantErr:    true,
 		},
+		{
+			name: "with_funcs",
+			fields: fields{
+				Data: struct {
+					A string
+					B int
+				}{
+					A: "hello",
+					B: 1,
+				},
+				Template: "A:{{title .A}}, B:{{.B}}",
+				Funcs: template.FuncMap{
+					"title": strings.Title,
+				},
+			},
+			wantWriter: "A:Hello, B:1",
+			wantErr:    false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			e := TemplateElement{
 				Data:     tt.fields.Data,
 				Template: tt.fields.Template,
+				Funcs:    tt.fields.Funcs,
 			}
 			writer := &bytes.Buffer{}
 			err := e.Render(writer)

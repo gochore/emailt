@@ -5,6 +5,7 @@ import (
 	"io"
 	"reflect"
 	"sort"
+	"text/template"
 
 	"github.com/gochore/emailt/internal/rend"
 	"github.com/gochore/emailt/style"
@@ -20,6 +21,7 @@ type Columns []Column
 type Table struct {
 	dataset interface{}
 	columns Columns
+	funcs   template.FuncMap
 }
 
 func NewTable() *Table {
@@ -32,6 +34,10 @@ func (t *Table) SetDataset(dataset interface{}) {
 
 func (t *Table) SetColumns(columns Columns) {
 	t.columns = columns
+}
+
+func (t *Table) SetFuncs(funcs template.FuncMap) {
+	t.funcs = funcs
 }
 
 func (t *Table) Render(writer io.Writer, themes ...style.Theme) error {
@@ -112,6 +118,7 @@ func (t *Table) Render(writer io.Writer, themes ...style.Theme) error {
 			e := TemplateElement{
 				Data:     dataset.Index(i),
 				Template: column.Template,
+				Funcs:    t.funcs,
 			}
 			if err := e.Render(writer, theme); err != nil {
 				return fmt.Errorf(errPrefix+"render td: %w", err)
