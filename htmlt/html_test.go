@@ -14,7 +14,7 @@ import (
 func TestT(t *testing.T) {
 	type args struct {
 		tag    string
-		format string
+		format Html
 		a      []interface{}
 	}
 	tests := []struct {
@@ -44,7 +44,7 @@ func TestT(t *testing.T) {
 func TestH(t *testing.T) {
 	type args struct {
 		level  int
-		format string
+		format Html
 		a      []interface{}
 	}
 	tests := []struct {
@@ -110,7 +110,7 @@ func TestHr(t *testing.T) {
 
 func TestP(t *testing.T) {
 	type args struct {
-		format string
+		format Html
 		a      []interface{}
 	}
 	tests := []struct {
@@ -138,7 +138,7 @@ func TestP(t *testing.T) {
 
 func TestPre(t *testing.T) {
 	type args struct {
-		format string
+		format Html
 		a      []interface{}
 	}
 	tests := []struct {
@@ -167,7 +167,7 @@ func TestPre(t *testing.T) {
 func TestA(t *testing.T) {
 	type args struct {
 		href   string
-		format string
+		format Html
 		a      []interface{}
 	}
 	tests := []struct {
@@ -196,7 +196,7 @@ func TestA(t *testing.T) {
 
 func TestB(t *testing.T) {
 	type args struct {
-		format string
+		format Html
 		a      []interface{}
 	}
 	tests := []struct {
@@ -243,7 +243,7 @@ func TestBr(t *testing.T) {
 
 func TestCode(t *testing.T) {
 	type args struct {
-		format string
+		format Html
 		a      []interface{}
 	}
 	tests := []struct {
@@ -271,7 +271,7 @@ func TestCode(t *testing.T) {
 
 func TestDel(t *testing.T) {
 	type args struct {
-		format string
+		format Html
 		a      []interface{}
 	}
 	tests := []struct {
@@ -299,7 +299,7 @@ func TestDel(t *testing.T) {
 
 func TestEm(t *testing.T) {
 	type args struct {
-		format string
+		format Html
 		a      []interface{}
 	}
 	tests := []struct {
@@ -398,7 +398,7 @@ func TestHtml_Render(t *testing.T) {
 
 func TestI(t *testing.T) {
 	type args struct {
-		format string
+		format Html
 		a      []interface{}
 	}
 	tests := []struct {
@@ -428,7 +428,7 @@ func TestImg(t *testing.T) {
 	type args struct {
 		src    string
 		alt    string
-		format string
+		format Html
 		a      []interface{}
 	}
 	tests := []struct {
@@ -458,7 +458,7 @@ func TestImg(t *testing.T) {
 
 func TestIns(t *testing.T) {
 	type args struct {
-		format string
+		format Html
 		a      []interface{}
 	}
 	tests := []struct {
@@ -486,7 +486,7 @@ func TestIns(t *testing.T) {
 
 func TestSmall(t *testing.T) {
 	type args struct {
-		format string
+		format Html
 		a      []interface{}
 	}
 	tests := []struct {
@@ -542,7 +542,7 @@ func TestSprintf(t *testing.T) {
 
 func TestStrong(t *testing.T) {
 	type args struct {
-		format string
+		format Html
 		a      []interface{}
 	}
 	tests := []struct {
@@ -565,5 +565,13 @@ func TestStrong(t *testing.T) {
 				t.Errorf("Strong() = %v, want %v", got, tt.want)
 			}
 		})
+	}
+}
+
+func TestHtml_Str(t *testing.T) {
+	var want Html = `<a href="/a"><b><code><del><em><h1><i><p>hello</p></i></h1></em></del></code></b></a>`
+	got := A("/a", B(Code(Del(Em(H(1, I(P("hello"))))))))
+	if got != want {
+		t.Errorf("Sprintf() = %v, want %v", got, want)
 	}
 }
