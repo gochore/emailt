@@ -20,13 +20,18 @@ type TemplateElement struct {
 }
 
 func (e TemplateElement) Render(writer io.Writer, themes ...style.Theme) error {
+	errPrefix := "TemplateElement.Render: "
+
 	t, err := template.New("").Parse(e.Template)
 	if err != nil {
-		return fmt.Errorf("parse template: %w", err)
+		return fmt.Errorf(errPrefix+"parse template: %w", err)
 	}
 	buffer := &bytes.Buffer{}
 	if err := t.Execute(buffer, e.Data); err != nil {
-		return fmt.Errorf("template execute: %w", err)
+		return fmt.Errorf(errPrefix+"template execute: %w", err)
 	}
-	return rend.RenderTheme(buffer, writer, rend.MergeThemes(themes))
+	if err := rend.RenderTheme(buffer, writer, rend.MergeThemes(themes)); err != nil {
+		return fmt.Errorf(errPrefix+"%w", err)
+	}
+	return nil
 }

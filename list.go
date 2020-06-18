@@ -32,6 +32,8 @@ func (l *List) Add(item ...Element) {
 }
 
 func (l *List) Render(writer io.Writer, themes ...style.Theme) error {
+	errPrefix := "List.Render: "
+
 	theme := rend.MergeThemes(themes)
 
 	render := rend.NewFmtWriter(writer)
@@ -46,12 +48,15 @@ func (l *List) Render(writer io.Writer, themes ...style.Theme) error {
 	for _, item := range l.items {
 		render.Printf("<li %s>", theme.Attributes("li"))
 		if err := item.Render(render, theme); err != nil {
-			return fmt.Errorf("render: %w", err)
+			return fmt.Errorf(errPrefix+"render li: %w", err)
 		}
 		render.Printlnf("</li>")
 	}
 
 	render.Printlnf("</%s>", tag)
 
-	return render.Err()
+	if err := render.Err(); err != nil {
+		return fmt.Errorf(errPrefix+"%w", err)
+	}
+	return nil
 }

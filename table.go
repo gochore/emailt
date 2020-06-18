@@ -35,15 +35,17 @@ func (t *Table) SetColumns(columns Columns) {
 }
 
 func (t *Table) Render(writer io.Writer, themes ...style.Theme) error {
+	errPrefix := "Table.Render: "
+
 	theme := rend.MergeThemes(themes)
 
 	dataset := reflect.ValueOf(t.dataset)
 	if dataset.Kind() != reflect.Slice {
-		return fmt.Errorf("%v is not a slice", dataset.Type())
+		return fmt.Errorf(errPrefix+"%v is not a slice", dataset.Type())
 	}
 
 	if dataset.Len() == 0 {
-		return fmt.Errorf("empty data")
+		return fmt.Errorf(errPrefix + "empty data")
 	}
 
 	mapItem := false
@@ -54,15 +56,15 @@ func (t *Table) Render(writer io.Writer, themes ...style.Theme) error {
 	case reflect.Struct:
 		// do nothing
 	default:
-		return fmt.Errorf("unsupported slice item type: %v", typ)
+		return fmt.Errorf(errPrefix+"unsupported slice item type: %v", typ)
 	}
 	if typ.Kind() != reflect.Struct && typ.Kind() != reflect.Map {
-		return fmt.Errorf("%v is not a struct", typ)
+		return fmt.Errorf(errPrefix+"%v is not a struct", typ)
 	}
 
 	for i := 0; i < dataset.Len(); i++ {
 		if t := dataset.Index(i).Type(); t != typ {
-			return fmt.Errorf("item %v is %v, not %v", i, t, typ)
+			return fmt.Errorf(errPrefix+"item %v is %v, not %v", i, t, typ)
 		}
 	}
 
@@ -112,7 +114,7 @@ func (t *Table) Render(writer io.Writer, themes ...style.Theme) error {
 				Template: column.Template,
 			}
 			if err := e.Render(writer, theme); err != nil {
-				return fmt.Errorf("render: %w", err)
+				return fmt.Errorf(errPrefix+"render td: %w", err)
 			}
 			render.Println("\n</td>")
 		}
@@ -121,5 +123,8 @@ func (t *Table) Render(writer io.Writer, themes ...style.Theme) error {
 
 	render.Println("</table>")
 
-	return render.Err()
+	if err := render.Err(); err != nil {
+		return fmt.Errorf(errPrefix+"%w", err)
+	}
+	return nil
 }
