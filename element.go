@@ -5,21 +5,13 @@ import (
 	"fmt"
 	"html/template"
 	"io"
-	"strings"
+
+	"github.com/gochore/emailt/internal/rend"
+	"github.com/gochore/emailt/style"
 )
 
 type Element interface {
-	Render(writer io.Writer, themes ...Theme) error
-}
-
-type StringElement string
-
-func NewStringElement(format string, a ...interface{}) StringElement {
-	return StringElement(fmt.Sprintf(format, a...))
-}
-
-func (e StringElement) Render(writer io.Writer, themes ...Theme) error {
-	return htmlRender(strings.NewReader(string(e)), writer, mergeThemes(themes))
+	Render(writer io.Writer, themes ...style.Theme) error
 }
 
 type TemplateElement struct {
@@ -27,7 +19,7 @@ type TemplateElement struct {
 	Template string
 }
 
-func (e TemplateElement) Render(writer io.Writer, themes ...Theme) error {
+func (e TemplateElement) Render(writer io.Writer, themes ...style.Theme) error {
 	t, err := template.New("").Parse(e.Template)
 	if err != nil {
 		return fmt.Errorf("parse template: %w", err)
@@ -36,5 +28,5 @@ func (e TemplateElement) Render(writer io.Writer, themes ...Theme) error {
 	if err := t.Execute(buffer, e.Data); err != nil {
 		return fmt.Errorf("template execute: %w", err)
 	}
-	return htmlRender(buffer, writer, mergeThemes(themes))
+	return rend.RenderTheme(buffer, writer, rend.MergeThemes(themes))
 }

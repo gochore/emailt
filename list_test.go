@@ -9,6 +9,9 @@ import (
 	"testing"
 
 	"golang.org/x/net/html"
+
+	"github.com/gochore/emailt/htmlt"
+	"github.com/gochore/emailt/style"
 )
 
 func TestList_Render(t *testing.T) {
@@ -17,7 +20,7 @@ func TestList_Render(t *testing.T) {
 		ordered bool
 	}
 	type args struct {
-		themes []Theme
+		themes []style.Theme
 	}
 	tests := []struct {
 		name    string
@@ -29,8 +32,8 @@ func TestList_Render(t *testing.T) {
 			name: "unordered",
 			fields: fields{
 				items: []Element{
-					NewStringElement("A"),
-					NewStringElement("B"),
+					htmlt.New("A"),
+					htmlt.New("B"),
 				},
 				ordered: false,
 			},
@@ -41,8 +44,8 @@ func TestList_Render(t *testing.T) {
 			name: "ordered",
 			fields: fields{
 				items: []Element{
-					NewStringElement("A"),
-					NewStringElement("B"),
+					htmlt.New("A"),
+					htmlt.New("B"),
 				},
 				ordered: true,
 			},

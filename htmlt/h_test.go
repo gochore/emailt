@@ -1,10 +1,10 @@
-package emailt
+package htmlt
 
 import (
 	"testing"
 )
 
-func TestNewHeadline(t *testing.T) {
+func TestH(t *testing.T) {
 	type args struct {
 		level  int
 		format string
@@ -13,7 +13,7 @@ func TestNewHeadline(t *testing.T) {
 	tests := []struct {
 		name string
 		args args
-		want Headline
+		want Html
 	}{
 		{
 			name: "regular",
@@ -45,7 +45,7 @@ func TestNewHeadline(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := NewHeadline(tt.args.level, tt.args.format, tt.args.a...); got != tt.want {
+			if got := H(tt.args.level, tt.args.format, tt.args.a...); got != tt.want {
 				t.Errorf("NewHeadline() = %v, want %v", got, tt.want)
 			}
 		})

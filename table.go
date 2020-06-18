@@ -5,6 +5,9 @@ import (
 	"io"
 	"reflect"
 	"sort"
+
+	"github.com/gochore/emailt/internal/rend"
+	"github.com/gochore/emailt/style"
 )
 
 type Column struct {
@@ -31,8 +34,8 @@ func (t *Table) SetColumns(columns Columns) {
 	t.columns = columns
 }
 
-func (t *Table) Render(writer io.Writer, themes ...Theme) error {
-	theme := mergeThemes(themes)
+func (t *Table) Render(writer io.Writer, themes ...style.Theme) error {
+	theme := rend.MergeThemes(themes)
 
 	dataset := reflect.ValueOf(t.dataset)
 	if dataset.Kind() != reflect.Slice {
@@ -89,7 +92,7 @@ func (t *Table) Render(writer io.Writer, themes ...Theme) error {
 		}
 	}
 
-	render := newFmtWriter(writer)
+	render := rend.NewFmtWriter(writer)
 
 	render.Printlnf("<table %s>", theme.Attributes("table"))
 
