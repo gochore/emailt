@@ -32,8 +32,8 @@ func TestList_Render(t *testing.T) {
 			name: "unordered",
 			fields: fields{
 				items: []Element{
-					htmlt.Sprintf("A"),
-					htmlt.Sprintf("B"),
+					htmlt.Element(htmlt.Sprintf("A")),
+					htmlt.Element(htmlt.Sprintf("B")),
 				},
 				ordered: false,
 			},
@@ -44,8 +44,8 @@ func TestList_Render(t *testing.T) {
 			name: "ordered",
 			fields: fields{
 				items: []Element{
-					htmlt.Sprintf("A"),
-					htmlt.Sprintf("B"),
+					htmlt.Element(htmlt.Sprintf("A")),
+					htmlt.Element(htmlt.Sprintf("B")),
 				},
 				ordered: true,
 			},
