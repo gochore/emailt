@@ -26,8 +26,8 @@ func TestStringElement_Render(t *testing.T) {
 			style: MapTheme{
 				"p": Attributes{
 					{
-						Name:  "style",
-						Value: "background-color:#dedede;",
+						Key: "style",
+						Val: "background-color:#dedede;",
 					},
 				},
 			},

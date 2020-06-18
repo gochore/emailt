@@ -15,12 +15,12 @@ func TestAttributes_String(t *testing.T) {
 			name: "regular",
 			as: Attributes{
 				{
-					Name:  "a",
-					Value: "aa",
+					Key: "a",
+					Val: "aa",
 				},
 				{
-					Name:  "b",
-					Value: "bb",
+					Key: "b",
+					Val: "bb",
 				},
 			},
 			want: `a="aa" b="bb"`,
@@ -55,8 +55,8 @@ func TestMapTheme_Attributes(t *testing.T) {
 			t: MapTheme{
 				"a": Attributes{
 					{
-						Name:  "an",
-						Value: "av",
+						Key: "an",
+						Val: "av",
 					},
 				},
 			},
@@ -65,8 +65,8 @@ func TestMapTheme_Attributes(t *testing.T) {
 			},
 			want: Attributes{
 				{
-					Name:  "an",
-					Value: "av",
+					Key: "an",
+					Val: "av",
 				},
 			},
 		},
@@ -103,8 +103,8 @@ func TestMapTheme_Exists(t *testing.T) {
 			t: MapTheme{
 				"a": Attributes{
 					{
-						Name:  "an",
-						Value: "av",
+						Key: "an",
+						Val: "av",
 					},
 				},
 			},
@@ -151,16 +151,16 @@ func TestChainTheme_Exists(t1 *testing.T) {
 				upstream: MapTheme{
 					"b": Attributes{
 						{
-							Name:  "bn",
-							Value: "bv",
+							Key: "bn",
+							Val: "bv",
 						},
 					},
 				},
 				inner: MapTheme{
 					"a": Attributes{
 						{
-							Name:  "an",
-							Value: "av",
+							Key: "an",
+							Val: "av",
 						},
 					},
 				},
@@ -176,16 +176,16 @@ func TestChainTheme_Exists(t1 *testing.T) {
 				upstream: MapTheme{
 					"b": Attributes{
 						{
-							Name:  "bn",
-							Value: "bv",
+							Key: "bn",
+							Val: "bv",
 						},
 					},
 				},
 				inner: MapTheme{
 					"a": Attributes{
 						{
-							Name:  "an",
-							Value: "av",
+							Key: "an",
+							Val: "av",
 						},
 					},
 				},

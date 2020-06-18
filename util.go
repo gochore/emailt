@@ -63,8 +63,7 @@ func writeStyles(node *html.Node, theme Theme) {
 		return
 	}
 	if node.Type == html.ElementNode {
-		attrs := theme.Attributes(node.Data).Merge(parseHtmlAttributes(node.Attr))
-		node.Attr = attrs.exportHtmlAttributes()
+		node.Attr = theme.Attributes(node.Data).Merge(node.Attr)
 	}
 	writeStyles(node.FirstChild, theme)
 	writeStyles(node.NextSibling, theme)
