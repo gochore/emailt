@@ -25,6 +25,11 @@ func (e Html) Render(writer io.Writer, themes ...style.Theme) error {
 	return nil
 }
 
+// Str return string value of Html
+func (e Html) Str() string {
+	return string(e)
+}
+
 // T return a html element with specified tag
 func T(tag string, format string, a ...interface{}) Html {
 	return Sprintf(fmt.Sprintf("<%s>%s</%s>", tag, format, tag), a...)
