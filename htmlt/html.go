@@ -97,8 +97,8 @@ func Strong(format Html, a ...interface{}) Html {
 }
 
 // Img return a html element <img>
-func Img(src, alt string, format Html, a ...interface{}) Html {
-	return Sprintf(fmt.Sprintf(`<a src="%s" alt="%s">%s</a>`, src, alt, format), a...)
+func Img(src, alt string) Html {
+	return Sprintf(`<img src="%s" alt="%s"/>`, src, alt)
 }
 
 // Del return a html element <del>

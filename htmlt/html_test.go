@@ -426,10 +426,8 @@ func TestI(t *testing.T) {
 
 func TestImg(t *testing.T) {
 	type args struct {
-		src    string
-		alt    string
-		format Html
-		a      []interface{}
+		src string
+		alt string
 	}
 	tests := []struct {
 		name string
@@ -439,17 +437,15 @@ func TestImg(t *testing.T) {
 		{
 			name: "regular",
 			args: args{
-				src:    "http://example.com",
-				alt:    "example",
-				format: "abc%d",
-				a:      []interface{}{1},
+				src: "http://example.com",
+				alt: "example",
 			},
-			want: `<a src="http://example.com" alt="example">abc1</a>`,
+			want: `<img src="http://example.com" alt="example"/>`,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := Img(tt.args.src, tt.args.alt, tt.args.format, tt.args.a...); got != tt.want {
+			if got := Img(tt.args.src, tt.args.alt); got != tt.want {
 				t.Errorf("Img() = %v, want %v", got, tt.want)
 			}
 		})
