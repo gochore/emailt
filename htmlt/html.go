@@ -1,8 +1,10 @@
 package htmlt
 
 import (
+	"encoding/base64"
 	"fmt"
 	"io"
+	"net/http"
 	"strings"
 
 	"github.com/gochore/emailt/internal/rend"
@@ -97,8 +99,18 @@ func Strong(format Html, a ...interface{}) Html {
 }
 
 // Img return a html element <img>
-func Img(src, alt string, format Html, a ...interface{}) Html {
-	return Sprintf(fmt.Sprintf(`<a src="%s" alt="%s">%s</a>`, src, alt, format), a...)
+func Img(src, alt string) Html {
+	return Sprintf(`<img src="%s" alt="%s"/>`, src, alt)
+}
+
+// Img return a html element <img> with embedded data
+func ImgEmbedded(image []byte, alt string) Html {
+	src := &strings.Builder{}
+	src.WriteString(fmt.Sprintf("data:%s;base64,", http.DetectContentType(image)))
+	encoder := base64.NewEncoder(base64.StdEncoding, src)
+	_, _ = encoder.Write(image)
+	_ = encoder.Close()
+	return Img(src.String(), alt)
 }
 
 // Del return a html element <del>
