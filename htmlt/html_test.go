@@ -2,6 +2,7 @@ package htmlt
 
 import (
 	"bytes"
+	"encoding/base64"
 	"fmt"
 	"io"
 	"testing"
@@ -569,5 +570,36 @@ func TestHtml_Str(t *testing.T) {
 	got := A("/a", B(Code(Del(Em(H(1, I(P("hello"))))))))
 	if got != want {
 		t.Errorf("Sprintf() = %v, want %v", got, want)
+	}
+}
+
+func TestImgEmbedded(t *testing.T) {
+	type args struct {
+		image []byte
+		alt   string
+	}
+	tests := []struct {
+		name string
+		args args
+		want Html
+	}{
+		{
+			name: "regular",
+			args: args{
+				image: func() []byte {
+					ret, _ := base64.StdEncoding.DecodeString("iVBORw0KGgoAAAANSUhEUgAAAWgAAAAKCAIAAAAWzFNnAAABHElEQVR4nOzUL0sDcRzHcRH/DIwqYpAViyiiYHdomMFD2LhgENMegDBBWBgLA8GBD2BJDIM7diBn8IIyzYIiisUyDCJqFKYWH8HnB1/GtfervvnC/Tj4DAVB4Pv+gBCG4fPLsapzs3vu214+UjWTFLofFVWzk/XS0pWqzfu1p1pd1flqpeEdqVqO95dLf6reNYerXlHVWtx2vzf/vqJqMnXrvu2nbpfHVW01vjq/q6rmRq6/D05UHTvczW1eqto5X8/uPKjaPV3s60WZCVVbvU/3bfTzqmphdCa9v+Cu01ttVd/Oiu7bi4VY1Y1HL71vjpIbVQdVAACF4QBgxnAAMGM4AJgxHADMGA4AZgwHADOGA4AZwwHA7D8AAP///GZtPo9PSgsAAAAASUVORK5CYII=")
+					return ret
+				}(),
+				alt: "test",
+			},
+			want: `<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAWgAAAAKCAIAAAAWzFNnAAABHElEQVR4nOzUL0sDcRzHcRH/DIwqYpAViyiiYHdomMFD2LhgENMegDBBWBgLA8GBD2BJDIM7diBn8IIyzYIiisUyDCJqFKYWH8HnB1/GtfervvnC/Tj4DAVB4Pv+gBCG4fPLsapzs3vu214+UjWTFLofFVWzk/XS0pWqzfu1p1pd1flqpeEdqVqO95dLf6reNYerXlHVWtx2vzf/vqJqMnXrvu2nbpfHVW01vjq/q6rmRq6/D05UHTvczW1eqto5X8/uPKjaPV3s60WZCVVbvU/3bfTzqmphdCa9v+Cu01ttVd/Oiu7bi4VY1Y1HL71vjpIbVQdVAACF4QBgxnAAMGM4AJgxHADMGA4AZgwHADOGA4AZwwHA7D8AAP///GZtPo9PSgsAAAAASUVORK5CYII=" alt="test"/>`,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := ImgEmbedded(tt.args.image, tt.args.alt); got != tt.want {
+				t.Errorf("ImgEmbedded() = %v, want %v", got, tt.want)
+			}
+		})
 	}
 }
